@@ -1,37 +1,30 @@
 #!/usr/bin/python3
-'''Reads todo list from api for employee id passed'''
+"""
+Model to make a request to an API and retrieve data
+"""
+
+
+import json
 import requests
-import sys
-base_url = 'https://jsonplaceholder.typicode.com/'
+from sys import argv
 
 
-def do_request():
-    '''Performs request'''
-    if len(sys.argv) < 2:
-        return print('USAGE:', __file__, '<employee id>')
-    eid = sys.argv[1]
-    try:
-        _eid = int(sys.argv[1])
-    except ValueError:
-        return print('Employee id must be an integer')
-    response = requests.get(base_url + 'users/' + eid)
-    if response.status_code == 404:
-        return print('User id not found')
-    elif response.status_code != 200:
-        return print('Error: status_code:', response.status_code)
-    user = response.json()
-    response = requests.get(base_url + 'todos/')
-    if response.status_code != 200:
-        return print('Error: status_code:', response.status_code)
-    todos = response.json()
-    user_todos = [todo for todo in todos
-                  if todo.get('userId') == user.get('id')]
-    completed = [todo for todo in user_todos if todo.get('completed')]
-    print('Employee', user.get('name'),
-          'is done with tasks({}/{}):'.
-          format(len(completed), len(user_todos)))
-    [print('\t', todo.get('title')) for todo in completed]
+if __name__ == "__main__":
+    URL = "https://jsonplaceholder.typicode.com/"
+    user_id = argv[1]
+    res = requests.get(f"{URL}users/{argv[1]}")
+    res = res.json()
+    user_name = res['name']
 
+    res = requests.get(f"{URL}todos")
+    all_todos = res.json()
+    user_todos = [todo for todo in all_todos if todo['userId'] == int(argv[1])]
+    nr_tasks = len(user_todos)
+    completed_tasks = [completed for completed in user_todos
+                       if completed['completed'] is True]
+    completed_title = [title['title'] for title in completed_tasks]
 
-if __name__ == '__main__':
-    do_request()
+    print(f"Employee {user_name} is done", end="")
+    print(f" with tasks({len(completed_tasks)}/{nr_tasks}):")
+    for title in completed_title:
+        print(f"\t {title}")
