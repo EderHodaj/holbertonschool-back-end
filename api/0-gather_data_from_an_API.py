@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """
-Model to make a request to an API and retrieve data
+Model to make a request to an
+API and retrieve data
 """
 
 
